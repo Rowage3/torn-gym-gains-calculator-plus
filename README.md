@@ -190,11 +190,12 @@ gain = ((S_capped * happy_mult + 8 * H^1.05 + adj + B) / 200000) * G * E * perk_
 ```
 
 Where:
-- `S_capped` - your stat, with a soft cap applied above 50M
-- `happy_mult` - derived from `1 + 0.07 * log(1 + H / 250)`
+- `S_capped` - your stat. Below 50M it is unchanged. Above 50M a soft cap applies: `50000000 + 0.057406 * (S - 50000000)^0.928996`
+- `happy_mult` - `1 + 0.07 * log(1 + H / 250)`
 - `H` - your current happiness
-- `adj` - a stat-specific high-happy adjustment constant
-- `B` - a stat-specific base constant
+- `adj` - a happy-dependent adjustment that scales a per-stat constant `A`: `(1 - (min(H, 99999) / 99999)^2) * A`. It contributes the full `A` at zero happy and fades to 0 as happy approaches 99999
+- `B` - a per-stat additive constant
+- `A`, `B` - per-stat constants (strength 1600/1700, defense 2100/-600, speed 1600/2000, dexterity 1800/1500)
 - `G` - gym dots divided by 10
 - `E` - energy per train
 - `perk_mult` - multiplicative product of all active bonus percentages
