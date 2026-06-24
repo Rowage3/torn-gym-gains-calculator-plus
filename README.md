@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/version-1.4.0-brightgreen?style=for-the-badge&labelColor=0d1015&color=8eff5a" alt="Version">
+<img src="https://img.shields.io/badge/version-1.5.0-brightgreen?style=for-the-badge&labelColor=0d1015&color=8eff5a" alt="Version">
 <img src="https://img.shields.io/badge/platform-Tampermonkey-orange?style=for-the-badge&labelColor=0d1015" alt="Platform">
 <img src="https://img.shields.io/badge/formula-Vladar%202.0-blue?style=for-the-badge&labelColor=0d1015" alt="Formula">
 <img src="https://img.shields.io/badge/license-GPL--3.0-red?style=for-the-badge&labelColor=0d1015" alt="License">
@@ -268,6 +268,29 @@ For reference, the stat requirements for each special gym (prerequisite gym unlo
 ## Changelog
 
 <details>
+<summary><strong>v1.5.0</strong> - API v2 migration and UI polish</summary>
+
+<br>
+
+**Changed: migrated to the Torn API v2 endpoints**
+
+The script now reads from `/v2/torn/gyms` and `/v2/user` instead of the older v1 selections endpoints. Every value was verified identical to v1 before the switch: gym list, battle stats, max happy, max energy, active gym, and all perk strings match byte for byte. Nothing about your gains, bonuses, or perks changed, this is purely the data source moving to the current API version.
+
+**Improved: accessibility and cross-browser compatibility**
+
+- Keyboard focus is now always visible on inputs, even on browsers that do not support modern CSS color functions.
+- Added solid color fallbacks so the active tab, the best-gym highlight in the Gyms table, and hover states stay visible on older browsers instead of disappearing.
+- The panel can now be dragged with touch and pen, not just a mouse.
+
+**Improved: readability**
+
+- Larger, clearer tab labels.
+- Lifted the muted text color across all six themes for better contrast on hints and sub-labels.
+- Four-column input rows collapse to two columns on very narrow screens.
+
+</details>
+
+<details>
 <summary><strong>v1.4.0</strong> - Balance Tab</summary>
 
 <br>
@@ -294,7 +317,7 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 </details>
 
 <details>
-<summary><strong>v1.3.1</strong></summary>
+<summary><strong>v1.3.1</strong> - GitHub link</summary>
 
 <br>
 
@@ -303,7 +326,7 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 </details>
 
 <details>
-<summary><strong>v1.3.0</strong></summary>
+<summary><strong>v1.3.0</strong> - Color themes</summary>
 
 <br>
 
@@ -312,7 +335,7 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 </details>
 
 <details>
-<summary><strong>v1.2.2</strong></summary>
+<summary><strong>v1.2.2</strong> - Speed and stability</summary>
 
 <br>
 
@@ -334,7 +357,7 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 </details>
 
 <details>
-<summary><strong>v1.2.1</strong></summary>
+<summary><strong>v1.2.1</strong> - Cost model and bonus fixes</summary>
 
 <br>
 
@@ -356,7 +379,7 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 </details>
 
 <details>
-<summary><strong>v1.0.2</strong></summary>
+<summary><strong>v1.0.2</strong> - 50M cap removed</summary>
 
 <br>
 
@@ -365,7 +388,7 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 </details>
 
 <details>
-<summary><strong>v1.0.1</strong></summary>
+<summary><strong>v1.0.1</strong> - Panel position fixes</summary>
 
 <br>
 
