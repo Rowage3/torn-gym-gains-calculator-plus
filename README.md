@@ -19,11 +19,37 @@
 
 ---
 
+> [!NOTE]
+> **TL;DR** Install, open the panel on `torn.com/gym.php`, paste a limited API key, hit Load. The script tells you exactly what each gym session will gain before you spend a point of energy.
+
 ## What it does
 
 The game shows you nothing about how gains scale. This script fills that gap. It simulates your actual training session down to the individual train, accounts for every perk and bonus, and tells you exactly what you are going to gain before you spend a single point of energy.
 
 Everything runs locally in your browser. No data leaves your machine except to the official Torn API using your own key.
+
+### At a glance
+
+| Tab | Answers the question |
+|---|---|
+| **Calculator** | How much will one session gain me right now? |
+| **Multi-Day** | How much over a week or a month of training? |
+| **Goal** | How long until I hit a target stat or a percentage increase? |
+| **Balance** | What do I train, and in what order, to reach a stat ratio or qualify for a special gym? |
+| **Gyms** | Which gym gives me the most per point of energy? |
+| **Setup** | API key, themes, and cache info. |
+
+```mermaid
+flowchart LR
+    K["Your API key"] --> API["Torn API v2"]
+    API --> S["Local cache"]
+    S --> C["Calculator"]
+    S --> M["Multi-Day"]
+    S --> G["Goal"]
+    S --> B["Balance"]
+    S --> Y["Gyms"]
+    C -. per-train simulation .-> R["Projected gains"]
+```
 
 ---
 
@@ -40,7 +66,11 @@ Everything runs locally in your browser. No data leaves your machine except to t
 
 That's it. Every field fills automatically from your account.
 
-> **API key note:** Limited access is enough. The script only reads gyms, bars, battle stats, and perks. It never writes anything.
+> [!TIP]
+> A **limited** API key is all you need. The script only reads gyms, bars, battle stats, and perks, and it never writes anything.
+
+> [!IMPORTANT]
+> Data does not load automatically on install. Open the **Setup** tab and click **Load** once. After that it caches and reuses your data until you reload.
 
 ---
 
@@ -185,22 +215,27 @@ Each day card shows exactly how many trains to do and on which stat, with the en
 
 The script uses Vladar's gain formula as documented by the Torn community.
 
-```
-gain = ((S_capped * happy_mult + 8 * H^1.05 + adj + B) / 200000) * G * E * perk_mult
-```
+$$
+\text{gain} = \frac{S_{\text{cap}} \cdot m_H + 8H^{1.05} + \text{adj} + B}{200000} \cdot \frac{D}{10} \cdot E \cdot \prod_i (1 + p_i)
+$$
+
+$$
+m_H = 1 + 0.07 \ln\left(1 + \frac{H}{250}\right)
+\qquad
+\text{adj} = \left(1 - \left(\frac{\min(H,\,99999)}{99999}\right)^2\right) A
+$$
 
 Where:
-- `S_capped` - your stat. Below 50M it is unchanged. Above 50M a soft cap applies: `50000000 + 0.057406 * (S - 50000000)^0.928996`
-- `happy_mult` - `1 + 0.07 * log(1 + H / 250)`
-- `H` - your current happiness
-- `adj` - a happy-dependent adjustment that scales a per-stat constant `A`: `(1 - (min(H, 99999) / 99999)^2) * A`. It contributes the full `A` at zero happy and fades to 0 as happy approaches 99999
-- `B` - a per-stat additive constant
-- `A`, `B` - per-stat constants (strength 1600/1700, defense 2100/-600, speed 1600/2000, dexterity 1800/1500)
-- `G` - gym dots divided by 10
-- `E` - energy per train
-- `perk_mult` - multiplicative product of all active bonus percentages
+- $S_{\text{cap}}$ - your stat. Below 50M it is unchanged. Above 50M a soft cap applies: $50000000 + 0.057406 \cdot (S - 50000000)^{0.928996}$
+- $m_H$ - the happy multiplier, $1 + 0.07 \ln(1 + H/250)$
+- $H$ - your current happiness
+- $\text{adj}$ - a happy-dependent term that scales the per-stat constant $A$. It contributes the full $A$ at zero happy and fades to 0 as happy approaches 99999
+- $A$, $B$ - per-stat constants (strength 1600/1700, defense 2100/-600, speed 1600/2000, dexterity 1800/1500)
+- $D$ - gym dots (so $D/10$ is the gym multiplier)
+- $E$ - energy per train
+- $p_i$ - each active bonus as a fraction, multiplied together
 
-Happy degrades each train by approximately `0.1 * energy_per_train * 5` points. Sessions are simulated train by train to capture this decay accurately.
+Happy degrades each train by approximately $0.1 \cdot E \cdot 5$ points. Sessions are simulated train by train to capture this decay accurately.
 
 ---
 
