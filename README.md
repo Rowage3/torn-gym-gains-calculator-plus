@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/version-1.5.0-brightgreen?style=for-the-badge&labelColor=0d1015&color=8eff5a" alt="Version">
+<img src="https://img.shields.io/badge/version-1.6.1-brightgreen?style=for-the-badge&labelColor=0d1015&color=8eff5a" alt="Version">
 <img src="https://img.shields.io/badge/platform-Tampermonkey-orange?style=for-the-badge&labelColor=0d1015" alt="Platform">
 <img src="https://img.shields.io/badge/formula-Vladar%202.0-blue?style=for-the-badge&labelColor=0d1015" alt="Formula">
 <img src="https://img.shields.io/badge/license-GPL--3.0-red?style=for-the-badge&labelColor=0d1015" alt="License">
@@ -301,6 +301,27 @@ For reference, the stat requirements for each special gym (prerequisite gym unlo
 ---
 
 ## Changelog
+
+<details>
+<summary><strong>v1.6.1</strong> - Fixed perks not loading</summary>
+
+<br>
+
+**Fixed: gym gain perks were silently ignored**
+
+The v2 migration changed where perks live in the API response. v1 returned them as flat top-level fields (`faction_perks`, `education_perks`, and so on); v2 nests them all under a single `perks` object keyed by source (`faction`, `job`, `property`, `education`, `book`). The script was still reading the old flat field names, so every perk list came back empty and all gym gain bonuses parsed as zero.
+
+If you have faction Steadfast perks, the property gym gain bonus, or education gym gain bonuses, your estimates were low. They now apply correctly.
+
+**Changed: dropped the remaining v1 compatibility code**
+
+Both API calls have been v2 only since v1.5.0, so the leftover v1 field handling in the battle stat reader was dead code and has been removed.
+
+**Fixed: added `cdn.jsdelivr.net` to `@connect`**
+
+The last-resort Chart.js fetch fallback was blocked by the connect allowlist. It only fires if both `@require` and the script tag load fail, which is close to impossible on desktop, but the allowlist is now correct.
+
+</details>
 
 <details>
 <summary><strong>v1.5.0</strong> - API v2 migration and UI polish</summary>
