@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/version-1.6.1-brightgreen?style=for-the-badge&labelColor=0d1015&color=8eff5a" alt="Version">
+<img src="https://img.shields.io/badge/version-1.7.1-brightgreen?style=for-the-badge&labelColor=0d1015&color=8eff5a" alt="Version">
 <img src="https://img.shields.io/badge/platform-Tampermonkey-orange?style=for-the-badge&labelColor=0d1015" alt="Platform">
 <img src="https://img.shields.io/badge/formula-Vladar%202.0-blue?style=for-the-badge&labelColor=0d1015" alt="Formula">
 <img src="https://img.shields.io/badge/license-GPL--3.0-red?style=for-the-badge&labelColor=0d1015" alt="License">
@@ -171,7 +171,7 @@ This tab answers the question: *given how my stats are distributed right now, wh
 
 ### Custom Ratio mode
 
-Enter four percentages that sum to 100. The script looks at your current stat distribution, figures out which stats are under their target share, and builds a training plan that brings you there using one train at a time from your Calculator gym.
+Enter four percentages that sum to 100. The script looks at your current stat distribution, figures out which stats are under their target share, and builds a training plan that brings you there one train at a time.
 
 Use the **Normalize** button if your numbers are close to 100 but not exact.
 
@@ -194,6 +194,21 @@ Incompatible combinations are automatically greyed out in the picker. You cannot
 | Frontline + Isoyamas | 27.8% | 35.0% | 27.8% | 9.4% |
 | Frontline + Elites | 27.8% | 9.4% | 27.8% | 35.0% |
 
+### Automatic gym selection
+
+The Balance tab picks the gym for you, separately for each stat, and it does not use the gym selected on the Calculator tab.
+
+Which gyms it can choose from:
+
+- **Your unlocked gyms**, read from the gym page itself. There is no API endpoint that reports gym membership, so the script reads the gym list on the page. Gyms you have not unlocked, and the one you are still earning gym EXP toward, are excluded. If the page cannot be read for any reason, it falls back to assuming every gym up to your active one is available.
+- **Special gyms**, whenever your stats satisfy the requirement at that point in the plan.
+
+Because energy per train is a straight multiplier on gains, the best gym for a stat is simply the one with the most dots on it. A 50 energy special gym is not more expensive per point than a 10 energy gym, so the planner always takes the highest dots available.
+
+Special gym access is rechecked as the plan runs. Training the stats that are behind is exactly what breaks a special gym requirement, so the plan will show you dropping out of one partway through and moving to your best normal gym. That is real, not an error.
+
+Each stat is also planned with **its own perks**. Faction Steadfast is often uneven, for example 12% on strength and defense but 10% on speed and dexterity, and education perks are frequently stat specific. The breakdown table shows the multiplier used for each stat.
+
 ### Precision toggle
 
 - **Precise** - stops when all four stats are within 0.5% of target
@@ -203,11 +218,20 @@ In gym mode, neither setting ever stops before the actual gym requirements are m
 
 ### The plan output
 
-The summary shows total trains needed, estimated days based on your daily energy budget, and total energy cost. Below that is a stat breakdown table and a full day-by-day plan for the first 90 days.
+The summary shows total trains needed, estimated days based on your daily energy budget, total energy cost, and how many different gyms the plan uses. Below that is a stat breakdown table listing the gyms and perk multiplier used per stat, then the day-by-day plan.
 
-Each day card shows exactly how many trains to do and on which stat, with the energy cost and estimated gain for each block of consecutive trains.
+The plan is grouped into **phases**. Every day inside a phase is identical, so a phase is a single card with exact whole numbers:
 
-**How the energy model works:** the energy value in the Calculator tab is your total daily budget. The gym selected in the Calculator determines the cost per train. Trains per day is `floor(daily budget / gym energy per train)`. The last day of the plan only uses as many trains as actually remain.
+```
+Days 1 - 28    28 days · 76 trains/day · 1000E/day
+  DEF   35/day · 350E/day · Cha Cha's
+  DEX   35/day · 350E/day · Cha Cha's
+  STR    6/day · 300E/day · Gym 3000
+```
+
+Open the card covering today, do exactly those trains, close it. A new phase starts only when something real changes: gaining or losing access to a special gym, or a remainder that does not divide evenly across the days. The first 40 phases are shown.
+
+**How the energy model works:** the energy value in the Calculator tab is your total daily budget. Each gym has its own energy cost per train, so a day can mix a 50 energy special gym with a 10 energy normal gym. The planner divides each phase's trains evenly across its days, adds days if the fullest day would exceed your budget, and never schedules a day you cannot afford. Energy left over at the end of a day is energy too small to fit another train.
 
 ---
 
@@ -303,23 +327,38 @@ For reference, the stat requirements for each special gym (prerequisite gym unlo
 ## Changelog
 
 <details>
-<summary><strong>v1.6.1</strong> - Fixed perks not loading</summary>
+<summary><strong>v1.7.1</strong> - Mobile and PDA layout</summary>
 
 <br>
 
-**Fixed: gym gain perks were silently ignored**
+- **Fixed:** Balance plan cards were cramped on a phone. The day card header and the train rows were fixed single-line flex layouts sized for a desktop panel, so the longer v1.7.0 text squeezed the gain figure. Train rows are now a three column grid, the header wraps, and gym names stay whole instead of breaking mid-name.
+- **Changed:** The Gym column in the breakdown table no longer repeats the train count when a stat uses only one gym, since the count already has its own column.
+- **Changed:** Shortened the explanatory line at the top of the Balance tab, which ran to six lines on a phone.
 
-The v2 migration changed where perks live in the API response. v1 returned them as flat top-level fields (`faction_perks`, `education_perks`, and so on); v2 nests them all under a single `perks` object keyed by source (`faction`, `job`, `property`, `education`, `book`). The script was still reading the old flat field names, so every perk list came back empty and all gym gain bonuses parsed as zero.
+</details>
 
-If you have faction Steadfast perks, the property gym gain bonus, or education gym gain bonuses, your estimates were low. They now apply correctly.
+<details>
+<summary><strong>v1.7.0</strong> - Balance tab gym selection</summary>
 
-**Changed: dropped the remaining v1 compatibility code**
+<br>
 
-Both API calls have been v2 only since v1.5.0, so the leftover v1 field handling in the battle stat reader was dead code and has been removed.
+- **Added:** The Balance plan picks a gym for each stat. It used to run the whole plan through the single gym selected on the Calculator tab, spending trains there even on stats that gym barely trains. Each stat now gets the best gym available to it, and the Calculator gym is no longer used by this tab. Energy per train is a straight multiplier on gains, so a 50 energy special gym costs no more per stat point than a 10 energy gym and the highest dots always wins.
+- **Added:** Unlocked gym detection. Torn's API does not expose gym membership, only `active_gym`, at any key access level. The script now reads your gym list from the gym page directly, which costs no API call and needs no key upgrade. Gyms you have not unlocked are excluded, as is the gym you are currently earning gym EXP toward. If the page cannot be read, it falls back to assuming everything up to your active gym is available.
+- **Added:** Special gym access is tracked as the plan runs. Special gyms enter the plan whenever your stats meet the requirement at that point and drop out when they no longer do. Training your lagging stats is what breaks a special gym requirement, so a plan that starts in Gym 3000 will show you leaving it partway through.
+- **Added:** Two columns in the Balance breakdown table, showing which gyms each stat uses and the perk multiplier applied to it.
+- **Fixed:** Every stat in the Balance plan was calculated with one stat's perks. The tab read the bonuses computed for whichever stat was selected on the Calculator tab and applied them to all four. If your faction Steadfast is uneven, for example 12% on strength and defense but 10% on speed and dexterity, or your education perks are stat specific, every other stat in the plan was wrong. Each stat now uses its own perks. Manual edits to the Calculator bonus fields are not used by the Balance tab, since one set of fields cannot describe four stats.
+- **Changed:** The day-by-day plan is grouped into phases. It previously rendered one card per day for the first 90 days, each listing consecutive train runs. Days are now built so that every day inside a phase is identical, making a phase a single card with exact whole train counts. A new phase begins only when special gym access changes or a remainder does not divide evenly across the days.
 
-**Fixed: added `cdn.jsdelivr.net` to `@connect`**
+</details>
 
-The last-resort Chart.js fetch fallback was blocked by the connect allowlist. It only fires if both `@require` and the script tag load fail, which is close to impossible on desktop, but the allowlist is now correct.
+<details>
+<summary><strong>v1.6.1</strong> - Perk reading fix</summary>
+
+<br>
+
+- **Fixed:** Gym gain perks were silently ignored. The v2 migration changed where perks live in the API response: v1 returned them as flat top-level fields (`faction_perks`, `education_perks`, and so on), v2 nests them under a single `perks` object keyed by source (`faction`, `job`, `property`, `education`, `book`). The script was still reading the old flat field names, so every perk list came back empty and all gym gain bonuses parsed as zero. If you have faction Steadfast, the property gym gain bonus, or education gym gain bonuses, your estimates were low.
+- **Fixed:** Added `cdn.jsdelivr.net` to `@connect`. The last-resort Chart.js fetch fallback was blocked by the connect allowlist. It only fires if both `@require` and the script tag fail, which is close to impossible on desktop, but the allowlist is now correct.
+- **Changed:** Dropped the remaining v1 compatibility code. Both API calls have been v2 only since v1.5.0, so the leftover v1 field handling in the battle stat reader was dead code.
 
 </details>
 
@@ -328,47 +367,37 @@ The last-resort Chart.js fetch fallback was blocked by the connect allowlist. It
 
 <br>
 
-**Changed: migrated to the Torn API v2 endpoints**
-
-The script now reads from `/v2/torn/gyms` and `/v2/user` instead of the older v1 selections endpoints. Every value was verified identical to v1 before the switch: gym list, battle stats, max happy, max energy, active gym, and all perk strings match byte for byte. Nothing about your gains, bonuses, or perks changed, this is purely the data source moving to the current API version.
-
-**Improved: accessibility and cross-browser compatibility**
-
-- Keyboard focus is now always visible on inputs, even on browsers that do not support modern CSS color functions.
-- Added solid color fallbacks so the active tab, the best-gym highlight in the Gyms table, and hover states stay visible on older browsers instead of disappearing.
-- The panel can now be dragged with touch and pen, not just a mouse.
-
-**Improved: readability**
-
-- Larger, clearer tab labels.
-- Lifted the muted text color across all six themes for better contrast on hints and sub-labels.
-- Four-column input rows collapse to two columns on very narrow screens.
+- **Changed:** Migrated to the Torn API v2 endpoints. The script now reads from `/v2/torn/gyms` and `/v2/user` instead of the older v1 selections endpoints. Every value was verified identical to v1 before the switch: gym list, battle stats, max happy, max energy, active gym, and all perk strings match byte for byte. Nothing about your gains, bonuses, or perks changed, this is purely the data source moving to the current API version.
+- **Improved:** Accessibility and cross-browser compatibility.
+  - Keyboard focus is now always visible on inputs, even on browsers that do not support modern CSS color functions.
+  - Added solid color fallbacks so the active tab, the best-gym highlight in the Gyms table, and hover states stay visible on older browsers instead of disappearing.
+  - The panel can now be dragged with touch and pen, not just a mouse.
+- **Improved:** Readability.
+  - Larger, clearer tab labels.
+  - Lifted the muted text color across all six themes for better contrast on hints and sub-labels.
+  - Four-column input rows collapse to two columns on very narrow screens.
 
 </details>
 
 <details>
-<summary><strong>v1.4.0</strong> - Balance Tab</summary>
+<summary><strong>v1.4.0</strong> - Balance tab</summary>
 
 <br>
 
-**Added: Balance tab** (between Goal and Gyms)
-
-A new tab dedicated to planning training toward a target stat distribution, either a custom ratio you define or the stat requirements of one or two special gyms.
-
-- Custom ratio mode: enter four percentages summing to 100, get a day-by-day training plan
-- Special gym mode: pick one or two gyms, the script derives the correct target ratio from their requirements and plans toward it
-- Incompatible gym pairs are automatically blocked in the picker (based purely on whether their stat requirements can be simultaneously satisfied)
-- All eight valid dual-gym combinations are supported with algebraically derived target ratios
-- Fast / Precise precision toggle: 1.0% or 0.5% convergence threshold
-- In gym mode, the plan never stops before the actual gym stat requirements are met regardless of precision setting
-- Day-by-day plan cards showing trains per stat, energy cost, and estimated gain per block
-- Daily energy budget model: the Calculator energy field is your total daily budget, the Calculator gym cost-per-train determines how many trains fit per day
-- Last day of the plan uses only the remaining trains needed, never forces a full day's budget
-- Three ratio bars (current, after plan, target) for visual comparison
-- Training breakdown table with final values, final percentages, and deviation from target per stat
-- Status bar on load now shows total battle stats instead of the selected single stat
-
-**Fixed: Balance tab gym pair compatibility** - the correct set of incompatible pairs is now enforced. Pairs are blocked if and only if their stat requirements mathematically cannot be simultaneously satisfied, which turns out to be: Balboas vs Frontline, and any two solo gyms.
+- **Added:** Balance tab, between Goal and Gyms. A tab dedicated to planning training toward a target stat distribution, either a custom ratio you define or the stat requirements of one or two special gyms.
+  - Custom ratio mode: enter four percentages summing to 100, get a day-by-day training plan.
+  - Special gym mode: pick one or two gyms, the script derives the correct target ratio from their requirements and plans toward it.
+  - Incompatible gym pairs are blocked in the picker, based purely on whether their stat requirements can be simultaneously satisfied.
+  - All eight valid dual-gym combinations are supported with algebraically derived target ratios.
+  - Fast and Precise toggle: 1.0% or 0.5% convergence threshold.
+  - In gym mode, the plan never stops before the actual gym stat requirements are met, regardless of precision setting.
+  - Day-by-day plan cards showing trains per stat, energy cost, and estimated gain per block.
+  - Daily energy budget model: the Calculator energy field is your total daily budget, the Calculator gym cost per train determines how many trains fit per day.
+  - The last day of the plan uses only the remaining trains needed, never a forced full day.
+  - Three ratio bars (current, after plan, target) for visual comparison.
+  - Training breakdown table with final values, final percentages, and deviation from target per stat.
+- **Fixed:** Balance tab gym pair compatibility. The correct set of incompatible pairs is now enforced. Pairs are blocked if and only if their stat requirements mathematically cannot be simultaneously satisfied, which turns out to be Balboas against Frontline, and any two solo gyms.
+- **Changed:** The status bar on load shows total battle stats instead of the selected single stat.
 
 </details>
 
@@ -386,7 +415,7 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 
 <br>
 
-- **Added:** Color themes. A theme picker in the Setup tab lets you switch the whole panel between six schemes: Matrix, Deep Ocean, Ember, Amethyst, Goldrush, and Slate. Each theme shows a live swatch preview before you commit.
+- **Added:** Color themes. A theme picker in the Setup tab switches the whole panel between six schemes: Matrix, Deep Ocean, Ember, Amethyst, Goldrush, and Slate. Each theme shows a live swatch preview before you commit.
 
 </details>
 
@@ -395,17 +424,17 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 
 <br>
 
-- **Fixed:** Long projections in Goal and Multi-day no longer freeze the panel.
+- **Fixed:** Long projections in Goal and Multi-Day no longer freeze the panel.
 - **Fixed:** Stale calculations from a previous tab no longer overwrite the current view. If you switch tabs mid-projection, the old result is discarded.
-- **Fixed:** Settings tab no longer overflows on narrow widths. Long perk strings now wrap cleanly.
-- **Fixed:** Panel body could be squeezed to zero height on very short viewports. Layout is now properly flex-constrained.
+- **Fixed:** The Setup tab no longer overflows on narrow widths. Long perk strings wrap cleanly.
+- **Fixed:** The panel body could be squeezed to zero height on very short viewports. Layout is now properly flex-constrained.
 - **Fixed:** Body scroll position no longer carries over between tabs. Each tab opens at the top.
-- **Fixed:** Drag handle now correctly ignores clicks on inputs, selects, and labels, not just buttons.
-- **Reworked:** Multi-day, Goal, and Gym Compare are significantly faster. The simulation skips per-train history arrays when only totals are needed.
-- **Reworked:** Settings persist on a 200ms debounce instead of writing on every keystroke.
+- **Fixed:** The drag handle correctly ignores clicks on inputs, selects, and labels, not just buttons.
+- **Improved:** Multi-Day, Goal, and Gyms are significantly faster. The simulation skips per-train history arrays when only totals are needed.
+- **Improved:** Settings persist on a 200ms debounce instead of writing on every keystroke.
 - **Improved:** Active stat pills have a colored glow matching the stat, with a press animation on click.
 - **Improved:** Buttons and icon buttons get a subtle hover background.
-- **Improved:** Result grids collapse to a single column on narrow viewports (600px and below).
+- **Improved:** Result grids collapse to a single column at 600px and below.
 - **Improved:** Warning messages use a consistent style across every tab.
 - **Improved:** Chart re-render animation shortened from 1000ms to 250ms.
 - **Improved:** Scrollbar thumb gets a brighter highlight on hover.
@@ -417,29 +446,29 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 
 <br>
 
-- **Fixed:** Stat bonuses from properties, jobs, and books now correctly apply only to their specific stats.
-- **Fixed:** The tool no longer freezes when starting a session with 0 energy.
-- **Fixed:** Auto-gym-pick now correctly skips zero-dot gyms.
-- **Fixed:** Chart tooltips now format large numbers correctly and consistently.
-- **Reworked:** Xanax estimates in Multi-day and Goal are now realistic. They account for natural energy regen and daily refill first, so xanax only appears when actually needed.
-- **Reworked:** Calculator tab session cost now uses the same regen + refill + xanax model.
 - **Added:** Gain per energy readouts in the Gyms and Calculator tabs.
 - **Added:** Star marker next to your current gym in the Gyms tab.
 - **Added:** Warning if happiness drops to 0 during a session.
 - **Added:** Reset bonuses to API-detected values button.
-- **Added:** Per-day and total cost breakdowns in Multi-day and Goal (e.g. "3 xanax + 1 refill + 600E natural" per day, scaled across the full schedule).
+- **Added:** Per-day and total cost breakdowns in Multi-Day and Goal, for example "3 xanax + 1 refill + 600E natural" per day, scaled across the full schedule.
 - **Added:** Jump preset cost display. Picking Choco, Happy, or Custom shows the actual items needed rather than an energy estimate.
-- **Added:** Warning if daily energy exceeds the regen + 1 refill + 3 xanax cap, with the shortfall shown.
-- **Improved:** Cleaner layouts across multiple tabs and better bonus breakdowns in the Settings tab.
+- **Added:** Warning if daily energy exceeds the regen plus 1 refill plus 3 xanax cap, with the shortfall shown.
+- **Fixed:** Stat bonuses from properties, jobs, and books apply only to their specific stats.
+- **Fixed:** The tool no longer freezes when starting a session with 0 energy.
+- **Fixed:** Auto gym pick correctly skips zero-dot gyms.
+- **Fixed:** Chart tooltips format large numbers correctly and consistently.
+- **Changed:** Xanax estimates in Multi-Day and Goal are now realistic. They account for natural energy regen and the daily refill first, so xanax only appears when actually needed.
+- **Changed:** Calculator session cost uses the same regen, refill and xanax model.
+- **Improved:** Cleaner layouts across multiple tabs and better bonus breakdowns in the Setup tab.
 
 </details>
 
 <details>
-<summary><strong>v1.0.2</strong> - 50M cap removed</summary>
+<summary><strong>v1.0.2</strong> - 50M gain cap</summary>
 
 <br>
 
-- **Changed:** Removed the 50M cap on gym gains. Calculations now work correctly beyond that threshold.
+- **Changed:** Removed the 50M cap on gym gains. Calculations work correctly beyond that threshold.
 
 </details>
 
@@ -448,10 +477,10 @@ A new tab dedicated to planning training toward a target stat distribution, eith
 
 <br>
 
-- **Fixed:** Panel could load with its header above the viewport if the saved position no longer fit the current window size or zoom level, making it impossible to minimize. Position is now clamped on load, on window resize, and after dragging.
-- **Added:** Reset position button (the corner arrow icon) in the panel header.
-- **Added:** "Reset panel position" button in the Setup tab.
-- **Changed:** Reset Everything now also resets panel position.
+- **Added:** Reset position button, the corner arrow icon in the panel header.
+- **Added:** Reset panel position button in the Setup tab.
+- **Fixed:** The panel could load with its header above the viewport if the saved position no longer fit the current window size or zoom level, making it impossible to minimize. Position is now clamped on load, on window resize, and after dragging.
+- **Changed:** Reset Everything also resets panel position.
 
 </details>
 
