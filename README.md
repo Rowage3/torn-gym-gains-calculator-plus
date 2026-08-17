@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/version-1.7.1-brightgreen?style=for-the-badge&labelColor=0d1015&color=8eff5a" alt="Version">
+<img src="https://img.shields.io/badge/version-1.7.2-brightgreen?style=for-the-badge&labelColor=0d1015&color=8eff5a" alt="Version">
 <img src="https://img.shields.io/badge/platform-Tampermonkey-orange?style=for-the-badge&labelColor=0d1015" alt="Platform">
 <img src="https://img.shields.io/badge/formula-Vladar%202.0-blue?style=for-the-badge&labelColor=0d1015" alt="Formula">
 <img src="https://img.shields.io/badge/license-GPL--3.0-red?style=for-the-badge&labelColor=0d1015" alt="License">
@@ -325,6 +325,17 @@ For reference, the stat requirements for each special gym (prerequisite gym unlo
 ---
 
 ## Changelog
+
+<details>
+<summary><strong>v1.7.2</strong> - Gyms are back</summary>
+
+<br>
+
+- **Fixed:** Every gym dropdown was empty and said "No gyms train this stat", which left the whole script unusable and the Balance tab with nothing to plan. The gym list loads again, with the same dots and energy costs as always.
+- **Fixed:** The Calculator stopped opening on the gym you actually train in. It picks yours again.
+- **Changed:** If the gym list ever fails to load, the script now says so on Load instead of quietly showing you empty dropdowns.
+
+</details>
 
 <details>
 <summary><strong>v1.7.1</strong> - Mobile and PDA layout</summary>
