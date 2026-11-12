@@ -1,187 +1,213 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/version-1.7.2-brightgreen?style=for-the-badge&labelColor=0d1015&color=8eff5a" alt="Version">
-<img src="https://img.shields.io/badge/platform-Tampermonkey-orange?style=for-the-badge&labelColor=0d1015" alt="Platform">
-<img src="https://img.shields.io/badge/formula-Vladar%202.0-blue?style=for-the-badge&labelColor=0d1015" alt="Formula">
-<img src="https://img.shields.io/badge/license-GPL--3.0-red?style=for-the-badge&labelColor=0d1015" alt="License">
-
-<br><br>
-
-# Torn Gym Gains Calculator+
-
-**A userscript for [Torn City](https://www.torn.com) that pulls your account data from the API and gives you precise gym training projections, multi-day plans, goal estimations, ratio balancing, and full gym comparisons, all built on Vladar's gain formula.**
+<img src="images/hero.png" alt="Gym Gains Calculator+ on desktop and mobile" width="100%">
 
 <br>
 
-[Installation](#installation) · [Tabs](#tabs) · [Balance Tab](#balance-tab-in-depth) · [FAQ](#faq) · [Changelog](#changelog)
+<a href="https://greasyfork.org/scripts/575551"><img src="https://img.shields.io/badge/install-Greasy%20Fork-1b1b1b?style=flat-square" alt="Install from Greasy Fork"></a>
+<img src="https://img.shields.io/badge/version-2.0.0-1b1b1b?style=flat-square" alt="Version 2.0.0">
+<img src="https://img.shields.io/badge/Torn%20PDA-supported-1b1b1b?style=flat-square" alt="Torn PDA supported">
+<img src="https://img.shields.io/badge/license-GPL--3.0-1b1b1b?style=flat-square" alt="GPL-3.0">
+
+<br>
+
+[Install](#install) · [Features](#features) · [Mobile](#mobile-and-torn-pda) · [Balance planner](#balance-planner) · [Formula](#the-formula) · [FAQ](#faq) · [Changelog](#changelog)
 
 </div>
 
----
+<br>
 
-> [!NOTE]
-> **TL;DR** Install, open the panel on `torn.com/gym.php`, paste a limited API key, hit Load. The script tells you exactly what each gym session will gain before you spend a point of energy.
+Torn never tells you what a gym session is worth. Gym Gains Calculator+ does. It reads your stats, happy, energy, gyms and perks from the Torn API, simulates every single train with Vladar's formula, and shows you the result before you spend a point of energy.
 
-## What it does
+It lives on `torn.com/gym.php`, looks like part of the game, and runs entirely in your browser.
 
-The game shows you nothing about how gains scale. This script fills that gap. It simulates your actual training session down to the individual train, accounts for every perk and bonus, and tells you exactly what you are going to gain before you spend a single point of energy.
+<br>
 
-Everything runs locally in your browser. No data leaves your machine except to the official Torn API using your own key.
+## Install
 
-### At a glance
+**Desktop**
 
-| Tab | Answers the question |
-|---|---|
-| **Calculator** | How much will one session gain me right now? |
-| **Multi-Day** | How much over a week or a month of training? |
-| **Goal** | How long until I hit a target stat or a percentage increase? |
-| **Balance** | What do I train, and in what order, to reach a stat ratio or qualify for a special gym? |
-| **Gyms** | Which gym gives me the most per point of energy? |
-| **Setup** | API key, themes, and cache info. |
+1. Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/).
+2. Open the [Greasy Fork page](https://greasyfork.org/scripts/575551) and press **Install this script**.
+3. Go to the [gym](https://www.torn.com/gym.php) and press **Open** on the Gym Gains Calculator+ bar.
+4. Press **Create API key**. Torn opens with everything the script needs already selected. Create the key and copy it.
+5. Paste it in **Setup** and press **Load everything from API**.
 
-```mermaid
-flowchart LR
-    K["Your API key"] --> API["Torn API v2"]
-    API --> S["Local cache"]
-    S --> C["Calculator"]
-    S --> M["Multi-Day"]
-    S --> G["Goal"]
-    S --> B["Balance"]
-    S --> Y["Gyms"]
-    C -. per-train simulation .-> R["Projected gains"]
-```
+**Torn PDA**
 
----
-
-## Installation
-
-**Requirements:** Tampermonkey (Chrome/Firefox/Edge) or Violentmonkey.
-
-1. Install [Tampermonkey](https://www.tampermonkey.net/) if you have not already.
-2. Click the install link on the [Greasy Fork page](https://greasyfork.org/scripts/575551).
-3. Confirm the install.
-4. Navigate to `torn.com/gym.php`.
-5. Click the **GYM CALC** button that appears in the bottom-left corner.
-6. Go to the **Setup** tab, paste your Torn API key, and click **Load everything from API**.
-
-That's it. Every field fills automatically from your account.
+Add the script in PDA's userscript manager with the Greasy Fork link or the script source. PDA fills in your API key on its own, so there is nothing to paste. Open the gym and press **Open**.
 
 > [!TIP]
-> A **limited** API key is all you need. The script only reads gyms, bars, battle stats, and perks, and it never writes anything.
-
-> [!IMPORTANT]
-> Data does not load automatically on install. Open the **Setup** tab and click **Load** once. After that it caches and reuses your data until you reload.
-
----
-
-## Tabs
-
-<details>
-<summary><strong>Calculator</strong> - Single session projection</summary>
+> Always use the **Create API key** button. It makes a key for this script only, so you can see it and remove it on your Torn API page at any time.
 
 <br>
 
-The baseline tab. Set your stat, happy, energy, and gym and get a full breakdown of what one session produces.
+## Features
 
-| Field | What it means |
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### Calculator
+One session, train by train. Pick a stat, set happy and energy, choose a gym and get total gain, final stat, happy used and the cost in items. Jump presets (Choco, Happy, 99k or custom) model boosted sessions for you.
+
+</td>
+<td width="50%" valign="top">
+
+### Multi-day
+Repeat your session over days, weeks or months. Set the number of days, how often you train and how many sessions per training day.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+### Goal
+Work backwards. Enter a stat target, a percentage increase or a number of days and see how long it takes and how much energy it costs.
+
+</td>
+<td valign="top">
+
+### Balance
+A full training plan toward a stat ratio or special gym access, picking the best unlocked gym per stat and grouping the result into simple daily phases.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+### Gyms
+Every gym that trains your stat, ranked by gain per session with your real numbers. Your unlocked gyms come first and the best one is highlighted.
+
+</td>
+<td valign="top">
+
+### Setup
+API key, a summary of everything that was loaded, cache and rate limit info, and a full reset.
+
+</td>
+</tr>
+</table>
+
+<br>
+
+### Multi-day
+<img src="images/multiday.png" alt="Multi-day projection" width="100%">
+
+### Goal
+<img src="images/goal.png" alt="Goal estimate in light mode" width="100%">
+
+### Gyms
+<img src="images/gyms.png" alt="Gym comparison" width="100%">
+
+### Setup
+<img src="images/setup.png" alt="Setup tab with the Create API key button" width="100%">
+
+<br>
+
+## Built to look like Torn
+
+The window uses Torn's own colors, title bars, tabs, buttons and inputs, so it fits in like it shipped with the game. It follows Torn's dark and light mode on its own, with no theme setting to manage.
+
+<img src="images/themes.png" alt="The same tab in dark and light mode" width="100%">
+
+Details that make it pleasant to use:
+
+- Charts with a crosshair, a tooltip for every point and a legend you can click to hide lines.
+- Number fields with **-** and **+** buttons. Hold one down and it speeds up.
+- Dropdowns, checkboxes and scrollbars styled to match the game.
+- Each stat keeps its own color everywhere: strength red, defense purple, speed blue, dexterity gold.
+
+<br>
+
+## Mobile and Torn PDA
+
+On a phone the calculator becomes a full screen app: tabs at the bottom, large touch targets, a 2x2 stat picker and tables turned into cards. It works the same in Torn PDA, charts included, because the script needs no outside libraries.
+
+<img src="images/mobile.png" alt="Calculator, Goal and Balance on a phone" width="100%">
+
+<br>
+
+## Balance planner
+
+The Balance tab answers one question: *what do I train, and how much each day, to reach this distribution?*
+
+<img src="images/balance.png" alt="Balance plan with training breakdown and daily phases" width="100%">
+
+**Two ways to set a target**
+
+- **Custom ratio:** four percentages that add up to 100. **Normalize** fixes numbers that are close.
+- **Special gyms:** pick one or two special gyms and the planner works out a distribution that meets both. Combinations that cannot work together are disabled.
+
+**How gyms are picked**
+
+Each stat gets its own gym. The planner chooses from the gyms you have unlocked plus any special gym your stats qualify for at that point in the plan. Energy per train is a straight multiplier on gains, so a 50 energy special gym costs no more per stat point than a 10 energy gym, and the most dots always wins.
+
+Special gym access is checked again as the plan runs. Training the stats that are behind is exactly what can break a special gym requirement, so a plan can move you out of one partway through. That is real, not a bug.
+
+Each stat also uses **its own perks**, since faction steadfast and education perks often differ per stat.
+
+**Reading the plan**
+
+The result shows totals, your current, planned and target distribution, a card per stat, and the plan itself. The plan is split into **phases** in which every day is identical:
+
+```
+Days 1 - 142     142 days · 12 trains/day · 150E/day
+  SPD   6/day · 60E/day · Force Training
+  STR   4/day · 40E/day · Atlas
+  DEX   2/day · 50E/day · Balboas Gym
+```
+
+Find the phase for today, do those trains, done. A new phase starts only when something changes, like gaining or losing a special gym.
+
+**Precision:** *Precise* stops when every stat is within 0.5% of target, *Fast* within 1%. With a special gym target, the plan never stops before the gym requirements are met.
+
+The energy field on the Calculator tab is your daily budget. Gyms with different energy costs can share a day, and no day ever needs more energy than the budget.
+
+<br>
+
+## The formula
+
+Gains use Vladar's formula, simulated one train at a time so happy loss is exact. Checked against real gym logs, it lands within 0.12%.
+
+$$
+\text{gain} = \frac{S_{\text{cap}} \cdot m_H + 8H^{1.05} + \text{adj} + B}{200000} \cdot \frac{D}{10} \cdot E \cdot \prod_i (1 + p_i)
+$$
+
+$$
+m_H = 1 + 0.07 \ln\left(1 + \frac{H}{250}\right)
+\qquad
+\text{adj} = \left(1 - \left(\frac{\min(H,\,99999)}{99999}\right)^2\right) A
+$$
+
+| Symbol | Meaning |
 |---|---|
-| Stat total | Your current value for the selected stat |
-| Happy | Starting happiness for the session |
-| Energy | Total energy budget to spend |
-| Gym | Which gym you are training at |
+| $S_{\text{cap}}$ | Your stat. Above 50M a soft cap applies: $50000000 + 0.057406 \cdot (S - 50000000)^{0.928996}$ |
+| $H$ | Current happy |
+| $A$, $B$ | Per-stat constants: strength 1600 / 1700, defense 2100 / -600, speed 1600 / 2000, dexterity 1800 / 1500 |
+| $D$ | Gym dots, so $D/10$ is the gym multiplier |
+| $E$ | Energy per train |
+| $p_i$ | Each bonus as a fraction, multiplied together |
 
-**Jump presets** let you model item-boosted sessions without manually entering the resulting happy and energy values. Choco Jump, Happy Jump, 99k Jump, and a fully custom option are all available.
-
-**Bonuses & Perks** auto-fills from your API data but can be edited manually. Includes property, education (general + stat-specific), faction steadfast, faction candy boost, job, and book bonuses.
-
-Results show total gain, final stat, happy consumed, energy used, and an estimated session cost in consumables.
-
-</details>
-
-<details>
-<summary><strong>Multi-Day</strong> - Project gains over time</summary>
+Happy drops by about $0.5 \cdot E$ after every train.
 
 <br>
 
-Takes your Calculator settings and simulates them forward across a schedule you define.
+## Special gym requirements
 
-- **Total days** - how many calendar days to project
-- **Train every X days** - if you do not train every day
-- **Sessions per train day** - how many full sessions per training day
-
-Outputs total gain, final stat, average per session, total energy, and a cost breakdown for the full period.
-
-</details>
-
-<details>
-<summary><strong>Goal</strong> - Work backwards from a target</summary>
-
-<br>
-
-Three modes:
-
-| Mode | What you enter | What you get |
+| Gym | Energy | Requirement |
 |---|---|---|
-| Stat target | The absolute stat value you want | Days, sessions, and energy needed |
-| % increase | How much you want to grow relative to now | Same |
-| Project days | A fixed number of days | Where you end up |
-
-Long projections run fast. The simulation skips per-train history allocation and only computes what is needed.
-
-</details>
-
-<details>
-<summary><strong>Balance</strong> - Train toward a stat distribution</summary>
-
-<br>
-
-See the [Balance Tab In Depth](#balance-tab-in-depth) section below.
-
-</details>
+| Balboas Gym | 25E | DEF + DEX at least 125% of STR + SPD |
+| Frontline Fitness | 25E | STR + SPD at least 125% of DEF + DEX |
+| Gym 3000 | 50E | STR at least 125% of your second highest stat |
+| Mr. Isoyamas | 50E | DEF at least 125% of your second highest stat |
+| Total Rebound | 50E | SPD at least 125% of your second highest stat |
+| Elites | 50E | DEX at least 125% of your second highest stat |
 
 <details>
-<summary><strong>Gyms</strong> - Compare every gym at once</summary>
+<summary>Target ratios for two special gyms at once</summary>
 
 <br>
-
-Runs your current Calculator stat, happy, energy, and bonus configuration against every gym that trains your selected stat. Sorted by per-session gain.
-
-Columns: gym name, dots, energy cost per train, gain per single train, gain for a full session, and gain per energy unit.
-
-Your currently selected gym is marked with a star.
-
-</details>
-
-<details>
-<summary><strong>Setup</strong> - API key, theme, and cache info</summary>
-
-<br>
-
-Paste your API key here and hit **Load everything from API**. The script fetches your gyms, battle stats, max happy, max energy, active gym, and all perk strings in two API calls.
-
-Also contains the theme picker (six color schemes), a cache summary showing when data was last loaded, a panel position reset button, and a full reset option.
-
-</details>
-
----
-
-## Balance Tab In Depth
-
-This tab answers the question: *given how my stats are distributed right now, what do I need to train and in what order to reach a specific ratio?*
-
-### Custom Ratio mode
-
-Enter four percentages that sum to 100. The script looks at your current stat distribution, figures out which stats are under their target share, and builds a training plan that brings you there one train at a time.
-
-Use the **Normalize** button if your numbers are close to 100 but not exact.
-
-### Special Gyms mode
-
-Pick one or two special gyms you want to qualify for. The script calculates the target stat distribution that satisfies both requirements simultaneously and builds the plan toward it.
-
-Incompatible combinations are automatically greyed out in the picker. You cannot select two gyms whose requirements directly contradict each other.
-
-**Valid dual-gym combinations and their target ratios:**
 
 | Combo | STR | DEF | SPD | DEX |
 |---|---|---|---|---|
@@ -194,137 +220,109 @@ Incompatible combinations are automatically greyed out in the picker. You cannot
 | Frontline + Isoyamas | 27.8% | 35.0% | 27.8% | 9.4% |
 | Frontline + Elites | 27.8% | 9.4% | 27.8% | 35.0% |
 
-### Automatic gym selection
+</details>
 
-The Balance tab picks the gym for you, separately for each stat, and it does not use the gym selected on the Calculator tab.
+<br>
 
-Which gyms it can choose from:
+## Privacy
 
-- **Your unlocked gyms**, read from the gym page itself. There is no API endpoint that reports gym membership, so the script reads the gym list on the page. Gyms you have not unlocked, and the one you are still earning gym EXP toward, are excluded. If the page cannot be read for any reason, it falls back to assuming every gym up to your active one is available.
-- **Special gyms**, whenever your stats satisfy the requirement at that point in the plan.
+- Your key is stored only in your userscript manager, or in Torn PDA.
+- The script talks to `api.torn.com` and nothing else. No analytics, no other servers.
+- It only reads. It never changes anything on your account.
+- At most 70 API calls per minute, and a normal load uses two.
 
-Because energy per train is a straight multiplier on gains, the best gym for a stat is simply the one with the most dots on it. A 50 energy special gym is not more expensive per point than a 10 energy gym, so the planner always takes the highest dots available.
-
-Special gym access is rechecked as the plan runs. Training the stats that are behind is exactly what breaks a special gym requirement, so the plan will show you dropping out of one partway through and moving to your best normal gym. That is real, not an error.
-
-Each stat is also planned with **its own perks**. Faction Steadfast is often uneven, for example 12% on strength and defense but 10% on speed and dexterity, and education perks are frequently stat specific. The breakdown table shows the multiplier used for each stat.
-
-### Precision toggle
-
-- **Precise** - stops when all four stats are within 0.5% of target
-- **Fast** - stops when all stats are within 1.0% of target (shorter plan, less accurate)
-
-In gym mode, neither setting ever stops before the actual gym requirements are met, regardless of the ratio deviation.
-
-### The plan output
-
-The summary shows total trains needed, estimated days based on your daily energy budget, total energy cost, and how many different gyms the plan uses. Below that is a stat breakdown table listing the gyms and perk multiplier used per stat, then the day-by-day plan.
-
-The plan is grouped into **phases**. Every day inside a phase is identical, so a phase is a single card with exact whole numbers:
-
-```
-Days 1 - 28    28 days · 76 trains/day · 1000E/day
-  DEF   35/day · 350E/day · Cha Cha's
-  DEX   35/day · 350E/day · Cha Cha's
-  STR    6/day · 300E/day · Gym 3000
-```
-
-Open the card covering today, do exactly those trains, close it. A new phase starts only when something real changes: gaining or losing access to a special gym, or a remainder that does not divide evenly across the days. The first 40 phases are shown.
-
-**How the energy model works:** the energy value in the Calculator tab is your total daily budget. Each gym has its own energy cost per train, so a day can mix a 50 energy special gym with a 10 energy normal gym. The planner divides each phase's trains evenly across its days, adds days if the fullest day would exceed your budget, and never schedules a day you cannot afford. Energy left over at the end of a day is energy too small to fit another train.
-
----
-
-## The Formula
-
-The script uses Vladar's gain formula as documented by the Torn community.
-
-$$
-\text{gain} = \frac{S_{\text{cap}} \cdot m_H + 8H^{1.05} + \text{adj} + B}{200000} \cdot \frac{D}{10} \cdot E \cdot \prod_i (1 + p_i)
-$$
-
-$$
-m_H = 1 + 0.07 \ln\left(1 + \frac{H}{250}\right)
-\qquad
-\text{adj} = \left(1 - \left(\frac{\min(H,\,99999)}{99999}\right)^2\right) A
-$$
-
-Where:
-- $S_{\text{cap}}$ - your stat. Below 50M it is unchanged. Above 50M a soft cap applies: $50000000 + 0.057406 \cdot (S - 50000000)^{0.928996}$
-- $m_H$ - the happy multiplier, $1 + 0.07 \ln(1 + H/250)$
-- $H$ - your current happiness
-- $\text{adj}$ - a happy-dependent term that scales the per-stat constant $A$. It contributes the full $A$ at zero happy and fades to 0 as happy approaches 99999
-- $A$, $B$ - per-stat constants (strength 1600/1700, defense 2100/-600, speed 1600/2000, dexterity 1800/1500)
-- $D$ - gym dots (so $D/10$ is the gym multiplier)
-- $E$ - energy per train
-- $p_i$ - each active bonus as a fraction, multiplied together
-
-Happy degrades each train by approximately $0.1 \cdot E \cdot 5$ points. Sessions are simulated train by train to capture this decay accurately.
-
----
+<br>
 
 ## FAQ
 
 <details>
-<summary>The script is not appearing on gym.php</summary>
+<summary><strong>I do not see the bar on the gym page</strong></summary>
 
-Make sure Tampermonkey is enabled and the script is active. Check the Tampermonkey dashboard and confirm the script shows as "Enabled". Some browser extensions or content security policies on other pages can interfere, but gym.php specifically should work without issues.
+<br>
 
-</details>
-
-<details>
-<summary>My stats or gym are not loading</summary>
-
-Go to the Setup tab and click Load. The script does not load API data automatically on install, you have to trigger it manually. After that it caches the data and reuses it until you reload again.
+Check that the script is enabled in Tampermonkey or Violentmonkey and that you are on `torn.com/gym.php`. If you are travelling the gym page has no gym, so the calculator shows a small floating **Open** button in the corner instead.
 
 </details>
 
 <details>
-<summary>The Balance tab is telling me I already meet the target</summary>
+<summary><strong>My stats are not filled in</strong></summary>
 
-Your current stat distribution is already within the precision threshold of the target ratio. If you are in gym mode and it still says this but you cannot enter the gym in-game, the issue is that the game checks actual raw stat values, not just ratios. Training gaps might be smaller than one train, or another requirement (like having unlocked the prerequisite gym) has not been met.
+<br>
 
-</details>
-
-<details>
-<summary>Why does the Balance tab use the Calculator gym for everything?</summary>
-
-Because the goal is to give you a concrete, actionable plan based on what you are actually training with, not a theoretical best-case using a different gym per stat. Set whichever gym makes sense in the Calculator and the Balance tab will plan around it.
+Open **Setup** and press **Load everything from API**. The data is cached after that, and the refresh button in the title bar loads it again.
 
 </details>
 
 <details>
-<summary>Can I trust the gain estimates?</summary>
+<summary><strong>It says my key is wrong or missing permissions</strong></summary>
 
-They are accurate to the formula. Real in-game gains have a random component per train (a stat-specific variance term). The script uses the deterministic average, so individual trains will vary slightly but session totals will be close. Over a long multi-day plan the variance averages out.
+<br>
+
+Press **Create API key** in Setup, create the key Torn offers you, and paste the new one.
 
 </details>
 
 <details>
-<summary>My bonuses look wrong</summary>
+<summary><strong>How exact are the numbers?</strong></summary>
 
-Check the Bonuses & Perks section in the Calculator tab. The script parses perk strings from the API using regex matching, which covers the standard formats Torn uses. If you have an unusual perk description format that the parser misses, you can override any field manually. Hit "Reset to detected" to restore API values at any time.
+<br>
+
+Each real train has a small random part. The script uses the average, so a single train can be slightly off while session totals stay close. Over many days the randomness evens out.
 
 </details>
 
----
+<details>
+<summary><strong>My bonuses look wrong</strong></summary>
 
-## Special Gym Requirements
+<br>
 
-For reference, the stat requirements for each special gym (prerequisite gym unlocks not listed, only the stat conditions):
+Open **Bonuses & Perks** on the Calculator tab. Every value can be edited by hand, and **Reset to detected** brings back what the API reported.
 
-| Gym | Energy | Requirement |
-|---|---|---|
-| Balboas Gym | 25E | DEF + DEX >= 125% of STR + SPD |
-| Frontline Fitness | 25E | STR + SPD >= 125% of DEF + DEX |
-| Gym 3000 | 50E | STR >= 125% of second highest stat |
-| Mr. Isoyamas | 50E | DEF >= 125% of second highest stat |
-| Total Rebound | 50E | SPD >= 125% of second highest stat |
-| Elites | 50E | DEX >= 125% of second highest stat |
+</details>
 
----
+<details>
+<summary><strong>The Balance tab says I already meet the target</strong></summary>
+
+<br>
+
+Your stats are already within the chosen precision of the target. If the game still refuses a special gym, check that you unlocked the gym it requires first.
+
+</details>
+
+<br>
 
 ## Changelog
+
+<details>
+<summary><strong>v2.0.0</strong> - Looks like Torn made it</summary>
+
+<br>
+
+- **Changed:** Complete redesign. The calculator now opens in a centered window from a bar above the gym, styled with Torn's own title bars, tabs, buttons and inputs.
+- **Changed:** Follows Torn's dark and light mode automatically. The old color themes are gone.
+- **Changed:** Desktop uses a two column layout: inputs on the left, results and chart on the right.
+- **Added:** A dedicated mobile layout: full screen, tabs at the bottom, large touch targets, 2x2 stat picker, and tables shown as cards.
+- **Changed:** New built-in charts with a crosshair tooltip, a clickable legend to hide lines, and cleaner axes. Chart.js is no longer loaded, which also makes charts work in Torn PDA.
+- **Added:** A **Create API key** button that opens Torn with exactly the permissions the script needs.
+- **Changed:** The Gyms tab lists your unlocked gyms first.
+
+</details>
+
+<details>
+<summary><strong>v1.7.3</strong> - Only gyms you own</summary>
+
+<br>
+
+- **Fixed:** When your active gym could not train the selected stat, the Calculator jumped to the invite-only "Unknown" gym. It now picks the best gym you have actually unlocked.
+- **Fixed:** The Balance planner now uses your unlocked gym list from the API instead of guessing from the gym page.
+- **Changed:** Gym dropdowns and the Gyms tab mark gyms you have not unlocked as "(locked)". The Gyms tab highlights the best unlocked gym.
+- **Changed:** Clearer API error messages (wrong key, missing permissions, rate limited, paused key).
+- **Changed:** "Reset everything" asks for a second tap instead of a browser popup, so it works in Torn PDA too.
+- **Changed:** The API rate limit is now 70 calls per minute.
+- **Fixed:** Very large day or session counts in Multi-D and Goal no longer freeze the page.
+- **Fixed:** The correct tab is highlighted when the script opens without an API key.
+
+</details>
 
 <details>
 <summary><strong>v1.7.2</strong> - Gyms are back</summary>
