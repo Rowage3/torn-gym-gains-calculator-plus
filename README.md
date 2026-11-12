@@ -5,7 +5,7 @@
 <br>
 
 <a href="https://greasyfork.org/scripts/575551"><img src="https://img.shields.io/badge/install-Greasy%20Fork-1b1b1b?style=flat-square" alt="Install from Greasy Fork"></a>
-<img src="https://img.shields.io/badge/version-2.0.0-1b1b1b?style=flat-square" alt="Version 2.0.0">
+<img src="https://img.shields.io/badge/version-2.0.1-1b1b1b?style=flat-square" alt="Version 2.0.1">
 <img src="https://img.shields.io/badge/Torn%20PDA-supported-1b1b1b?style=flat-square" alt="Torn PDA supported">
 <img src="https://img.shields.io/badge/license-GPL--3.0-1b1b1b?style=flat-square" alt="GPL-3.0">
 
